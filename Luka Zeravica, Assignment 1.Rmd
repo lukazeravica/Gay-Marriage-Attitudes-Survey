@@ -1,0 +1,179 @@
+---
+title: "CEU-Intermediate Quantitative Social Research-Assignment 1"
+author: "Luka Zeravica"
+date: "10/26/2020"
+output:
+  html_document:
+    df_print: paged
+---
+
+CEU-Intermediate Quantitative Social Research-Assignment 1
+
+##1.1
+
+```{r}
+setwd ("C:/Users/lukaz/Documents/R programming/Exercise 1")
+gay <- read.csv("gay.csv")
+ccap2012 <- read.csv("ccap2012.csv")
+gayreshaped <- read.csv("gayreshaped.csv")
+summary(gay)
+summary(gayreshaped)
+summary(ccap2012)
+gay$treatment= as.factor(gay$treatment)
+gayreshaped$treatment= as.factor(gayreshaped$treatment)
+class(gayreshaped$treatment)
+```
+
+It can be seen that the gay data set contains 69592 observations and four variables. The variables are study, treatment, wave, and ssm. The number of responses in study 1 is 59207, and in study 2 is 10385.37735 units did not receive Contact, 6514 respondents received a recycling script by gay canvassers (of the first study), 6747 respondents received a recycling script by a straight canvasser, and the same-sex marriage script by gay canvassers had 12 452 respondents while a same-sex marriage script by straight canvassers had 6417 respondents. 
+Gayreshaped dataset has 9507 units in study 1 and 2441 units in study 2. No contact contains 6441 units, the recycling scripts by gay and straight canvassers have 1046 and 1039 units. Same-sex marriage scripts by gay and straight canvassers have 2389 and 1033 units. The averages of experimental groups are similar (58.43,58.78,59.72,59.76). 
+
+##1.2
+```{r}
+prop.table(table(gay$ssm))
+prop.table(table(gay$treatment))
+treatment <- prop.table(table(gay$treatment))
+ssm <- prop.table(table(gay$ssm))
+barplot(treatment)
+barplot(ssm)
+
+```
+
+Treatment barplot shows us the visual view of respondent distribution in different treatment types. It also shows the asymmetrical bimodal distribution in favor of the second half of the scores. Furthermore, the ssm barplot shows the amount of support for same-sex marriage among the respondents. It shows the proportion of support by every treatment type.
+
+
+##1.3
+ 
+```{r}
+boxplot(gayreshaped$therm1, gayreshaped$therm2, gayreshaped$therm3, gayreshaped$therm4, main= "Gayreshaped Thermometer Rating", names =c("therm1", "therm2", "therm3", "therm4"))
+main="Thermometer Rating"
+boxplot(ccap2012$gaytherm, main="Feeling towards gay couples distribution\n [ccap2012]",ylab= "Feeling towards gay couples")
+```
+
+The boxplots show four therms that have range. Every median is located between 50 and 60 values. The range of outliers starts from near 0 and ends near 100. The range of median is pretty close (between 50 and 60 value). Median values are similar in all therms, except for little variation in therm 1.
+
+
+
+##1.4
+```{r}
+gay$ssm <- as.numeric(gay$ssm)
+nocontact.wl.sl <- subset(gay, subset = (treatment=="No Contact") & (study==1) & (wave==1))
+gay3.w1.s1<-subset(gay,subset = (treatment=="Same-Sex Marriage Script by Gay Canvasser")& (study==1)& (wave==1))
+straight.w1.s1<-subset(gay, subset = (treatment=="Same-Sex Marriage Script by Straight Canvasser")& (study==1)&(wave==1))
+mean(nocontact.wl.sl$ssm,rm.na=T)
+mean(gay3.w1.s1$ssm, rm.na=T)
+```
+
+The average treatment effects of gay and straight canvassers on support for same-sex marriage have a similar percentage of means result. Therefore, randomization was done properly.
+
+
+##1.5
+
+```{r}
+nocontact.w2.sl <- subset(gay, subset = (treatment=="No Contact") & (study==1) & (wave==2))
+gay3.w2.s1<-subset(gay,subset = (treatment=="Same-Sex Marriage Script by Gay Canvasser")& (study==1)& (wave==2))
+straight.w2.s1<-subset(gay, subset = (treatment=="Same-Sex Marriage Script by Straight Canvasser")& (study==1)&(wave==2))
+mean(nocontact.w2.sl$ssm,rm.na=T)
+mean(gay3.w2.s1$ssm, rm.na=T)
+mean(straight.w2.s1$ssm,rm.na=T)
+mean(gay3.w2.s1$ssm, rm.na=T)-mean(nocontact.w2.sl$ssm,rm.na=T)
+mean(straight.w2.s1$ssm,rm.na=T)-mean(nocontact.w2.sl$ssm,rm.na=T)
+
+```
+
+The straight canvassers of the second wave of study one had a higher treatment effect than the gay canvassers. The same-sex marriage script is 12.22%, and the straight canvassers had a treatment effect of 9.98%.
+
+
+##1.6
+
+```{r}
+recycling.straight.w2.s1<-subset(gay,subset = (treatment=="Recycling Script by Straight Canvasser" & (study==1) & (wave==2)))
+recycling.gay.w2.s1<-subset(gay,subset = (treatment=="Recycling Script by Gay Canvasser" & (study==1) & (wave==2)))
+mean(gay3.w2.s1$ssm)-mean(recycling.gay.w2.s1$ssm)
+mean(straight.w2.s1$ssm)-mean(recycling.straight.w2.s1$ssm)
+```
+
+The recycling script is a counterfactual. Also, there is a greater difference in the difference of means between recycling script by straight canvasser and same-sex marriage script by straight. 
+
+
+##1.7
+
+
+```{r}
+gay.s1.t1_t4 <- gay[gay$study == "1" & gay$treatment != "Recycling Script by Gay Canvasser",]
+gay.s1.t1_t4 <- gay.s1.t1_t4[gay.s1.t1_t4$treatment != "Recycling Script by Straight Canvasser",]
+a = tapply(gay.s1.t1_t4$ssm, list(gay.s1.t1_t4$treatment, gay.s1.t1_t4$wave), mean)
+a
+(a[4,2:7]-a[4,1:6])-(a[1,2:7]-a[1,1:6])
+(a[5,2:7]-a[5,1:6])-(a[1,2:7]-a[1,1:6])
+```
+
+Here is used the method of difference-in-difference. Based on calculus, we can see that difference in some waves has a negative value, but others have a positive value. If there is a negative value, then treatment has no effect. If it is positive, the treatment has an effect. Since the time interval between wave 6 and wave 7 amounts to one year, it can be inferred that after a longer time period, the effect of gay and straight canvassing treatment does not have an effect.
+
+
+##1.8
+
+```{r}
+gay$ssm<-as.numeric(gay$ssm)
+nocontact.s2.w1<-subset(gay,subset = (treatment=="No Contact")&(study==2)&(wave==1))
+gay3.s2wave1<-subset(gay,subset = (treatment=="Same-Sex Marriage Script by Gay Canvasser")&(study==2)&(wave==1))
+mean(nocontact.s2.w1$ssm)
+mean(gay3.s2wave1$ssm)
+```
+
+In the second study, the mean for no contact and the same-sex marriage script by a gay canvasser resulted around 2.97. A similar mean is expected, which means that the randomization of both groups was appropriately done. It seems like both groups have the same characteristics.
+
+##1.9
+
+```{r}
+nocontact.w2.s2 <- subset(gay, subset = (treatment=="No Contact") & (study==2) & (wave==2))
+
+gay3.w2.s2 <- subset(gay, subset = (treatment=="Same-Sex Marriage Script by Gay Canvasser") & (study==2) & (wave==2))
+
+mean(gay3.w2.s1$ssm) - mean(nocontact.w2.sl$ssm)
+
+mean(gay3.w2.s2$ssm) - mean(nocontact.w2.s2$ssm)
+```
+
+In study 2, the treatment effect of gay canvassing amounts to 12.38% compared to no contact. In study 1, the treatment effect of gay canvassing amounts to 9.98%. The results are consistent between studies even though the treatment effect is greater in study 2, but there is a similar increase in treatment effect in study 1. 
+
+##1.10
+
+```{r}
+nocontact.s2 <- subset(gay, subset = (treatment=="No Contact") & (study==2))
+
+gay3.s2 <- subset(gay, subset = (treatment=="Same-Sex Marriage Script by Gay Canvasser") & (study==2))
+
+tapply(gay3.s2$ssm, gay3.s2$wave, mean) - tapply(nocontact.s2$ssm, nocontact.s2$wave, mean)
+```
+
+There are average or mean differences between same-sex marriage gay canvasser treatments in study 2, which occur in different waves. For instance, the difference between second, third, and fourth-wave mean is minuscule, but between first and seventh and others, there is a significant difference. It should be noted that the time interval between the first and fourth mean was two months. Waves 4 and 7 were conducted within a time interval of one year. Likewise, there is a positive difference between all waves except between weave 3 and 4 (where the difference was negative). This indicates that changes were not coherent enough.
+
+##1.11
+
+```{r}
+gayreshapedsubset1 <- gayreshaped$therm1[gayreshaped$treatment == "No Contact" & gayreshaped$study==1]
+
+gayreshapedsubset2 <- gayreshaped$therm2[gayreshaped$treatment == "No Contact" & gayreshaped$study == 1]
+
+cor(gayreshapedsubset1, gayreshapedsubset2, use = "complete.obs")
+```
+
+The correlation between respondents’ feeling thermometer ratings in waves 1 and 2 for the control group in study 1 amounts to 99%. This is an unusually unlikely high percentage of correlation.
+
+##1.12
+
+```{r}
+nocontact.s2.gayreshaped <- subset(gayreshaped, subset =(study == 2) & (treatment == "No Contact")) 
+
+cor(nocontact.s2.gayreshaped[,3:6], use = "pairwise.complete.obs")
+```
+
+Between four waves, the correlation varies from 93% to 97%. This percentage of the results are starting to cast doubt about the research itself.
+
+##1.13
+
+```{r}
+plot(nocontact.s2.gayreshaped[,3:6])
+```
+
+The scatterplots confirm previous assumptions. It shows that the correlation is suspiciously high. This means that the respondents gave the same answers after a more extended period of time. It looks like the research is rigged.
