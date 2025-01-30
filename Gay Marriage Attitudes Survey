@@ -1,12 +1,12 @@
 ---
-title: "CEU-Intermediate Quantitative Social Research-Assignment 1"
+title: "Gay Marriage Attitudes Survey"
 author: "Luka Zeravica"
 date: "10/26/2020"
 output:
   html_document:
     df_print: paged
 ---
-
+Made for:
 CEU-Intermediate Quantitative Social Research-Assignment 1
 
 ##1.1
